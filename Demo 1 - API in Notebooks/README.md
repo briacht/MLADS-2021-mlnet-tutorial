@@ -4,19 +4,30 @@ This demo uses the ML.NET API in a .NET Interactive Notebook to build a machine 
 
 ## Getting started
 
+### Set up
+
 1. Install the latest version of [VS Code](https://code.visualstudio.com/).
 2. Install the latest [.NET 5 SDK](https://dotnet.microsoft.com/download/dotnet/5.0).
 3. Install the .NET Interactive Notebooks extension, either:
     - From the [marketplace](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.dotnet-interactive-vscode), or
     - From the Extensions manager in VS Code.
-    
+    ![Screenshot of Extensions in VS Code](../Images/dotnet-interactive-extension.png)
 
-Getting Started
-Install the latest Visual Studio Code.
+### Opening a Notebook
 
-Install the latest .NET 5 SDK
+Open the Command Pallette (**Ctrl+Shift+P**), select **.NET Interactive: Open notebook** and navigate to the *TaxiFareInteractive.ipynb* file.
+![Screenshot of VS Code Command Pallette](../Images/vscode-command-pallette.png)
 
-Install the .NET Interactive Notebooks extension from the marketplace.
+### Running cells in a Notebook
 
-Opening and Creating notebooks
-To open an existing .NET notebook, bring up the Command Palette(Ctrl+Shift+P) and select .NET Interactive: Open notebook. Now, navigate to a local .ipynb file
+To run one cell, you can:
+
+1. Click the play button next to the call, or
+2. Hit **Ctrl+Alt+Enter**
+
+To execute all cells at once, hit the play button icon in the top right.
+![Screenshot of the Execute all cells icon](../Images/execute-all-cells.png)
+
+### Additional resources
+
+You can learn more about .NET Interactive in the [dotnet/interactive repo](https://github.com/dotnet/interactive/blob/main/docs/README.md).

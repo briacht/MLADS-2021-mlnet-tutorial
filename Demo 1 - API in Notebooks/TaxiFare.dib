@@ -1,7 +1,6 @@
 #!csharp
 
-/* ML.NET Model Builder generated Notebook file. Notebook files contain both code snippets and rich text elements.
-Use the "run" button in the left margin to execute each code snippet and explore ML.NET. */
+// Install necessary NuGet packages
 
 #i "nuget:https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet5/nuget/v3/index.json" 
 #i "nuget:https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-tools/nuget/v3/index.json" 
@@ -13,8 +12,7 @@ Use the "run" button in the left margin to execute each code snippet and explore
 
 #!csharp
 
-using Microsoft.ML;
-using Microsoft.ML.Data;
+// Add necessary using statements
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -22,6 +20,8 @@ using System.IO;
 using System.Linq;
 using Microsoft.Data.Analysis;
 using XPlot.Plotly;
+using Microsoft.ML;
+using Microsoft.ML.Data;
 
 #!csharp
 
@@ -61,10 +61,7 @@ Formatter.Register<DataFrame>((df, writer) =>
 
 #!csharp
 
-string taxiDataPath = "taxi-fare-train.csv";
-
-#!csharp
-
+// Define the model input schema
 public class ModelInput
 {
         [ColumnName("vendor_id"), LoadColumn(0)]
@@ -97,27 +94,23 @@ public class ModelInput
 
 }
 
-#!csharp
+Console.WriteLine("Done defining model input...");
 
+// Define the model output schema
 public class ModelOutput
 {
     public float Score { get; set; }
 }
 
-#!csharp
-
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using Microsoft.ML;
-using Microsoft.ML.Data;
+Console.WriteLine("Done defining model output...");
 
 #!csharp
 
-/* Setup the pipeline and train the model */
+// Load data from file to IDataView
 
 #!time
+
+string taxiDataPath = "taxi-fare-train.csv";
 
 var mlContext = new MLContext();
 
@@ -128,18 +121,28 @@ IDataView trainingDataView = mlContext.Data.LoadFromTextFile<ModelInput>(
     allowQuoting: true,
     allowSparse: false);
 
-// Build training pipeline
-// Data process configuration with pipeline data transformations 
+Console.WriteLine("Done...")
+
+#!csharp
+
+// Build the data processing and training pipeline and train the model
+
+#!time
+
+// Add data transformations to pipeline
 var dataProcessPipeline = mlContext.Transforms.Categorical.OneHotEncoding(new[] { new InputOutputColumnPair("vendor_id", "vendor_id"), new InputOutputColumnPair("payment_type", "payment_type") })
     .Append(mlContext.Transforms.Concatenate("Features", new[] { "vendor_id", "payment_type", "rate_code", "passenger_count", "trip_time_in_secs", "trip_distance" }));
            
 // Set the training algorithm 
 var trainer = mlContext.Regression.Trainers.LightGbm(labelColumnName: "fare_amount", featureColumnName: "Features");
 
+// Add trainer to pipeline
 var trainingPipeline = dataProcessPipeline.Append(trainer);
 
-// Train Model
+// Train model
 ITransformer model = trainingPipeline.Fit(trainingDataView);
+
+Console.WriteLine("Done training model...")
 
 #!csharp
 
