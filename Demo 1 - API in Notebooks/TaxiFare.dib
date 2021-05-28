@@ -1,0 +1,253 @@
+#!csharp
+
+/* ML.NET Model Builder generated Notebook file. Notebook files contain both code snippets and rich text elements.
+Use the "run" button in the left margin to execute each code snippet and explore ML.NET. */
+
+#i "nuget:https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet5/nuget/v3/index.json" 
+#i "nuget:https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-tools/nuget/v3/index.json" 
+
+#r "nuget:Microsoft.ML,1.5.1"
+#r "nuget:Microsoft.ML.AutoML,0.17.1"
+#r "nuget:Microsoft.Data.Analysis,0.4.0"
+#r "nuget: XPlot.Plotly.Interactive, 4.0.1"
+
+#!csharp
+
+using Microsoft.ML;
+using Microsoft.ML.Data;
+using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.IO;
+using System.Linq;
+using Microsoft.Data.Analysis;
+using XPlot.Plotly;
+
+#!csharp
+
+/* Register the data */
+
+using Microsoft.AspNetCore.Html;
+using Microsoft.DotNet.Interactive.Formatting;
+using static Microsoft.DotNet.Interactive.Formatting.PocketViewTags;
+
+Formatter.Register<DataFrame>((df, writer) =>
+{
+    var headers = new List<IHtmlContent>();
+    headers.Add(th(i("index")));
+    headers.AddRange(df.Columns.Select(c => (IHtmlContent) th(c.Name)));
+    var rows = new List<List<IHtmlContent>>();
+    var take = 20;
+    for (var i = 0; i < Math.Min(take, df.Rows.Count); i++)
+    {
+        var cells = new List<IHtmlContent>();
+        cells.Add(td(i));
+        foreach (var obj in df.Rows[i])
+        {
+            cells.Add(td(obj));
+        }
+        rows.Add(cells);
+    }
+    
+    var t = table(
+        thead(
+            headers),
+        tbody(
+            rows.Select(
+                r => tr(r))));
+    
+    writer.Write(t);
+}, "text/html");
+
+#!csharp
+
+string taxiDataPath = "taxi-fare-train.csv";
+
+#!csharp
+
+public class ModelInput
+{
+        [ColumnName("vendor_id"), LoadColumn(0)]
+        public string Vendor_id { get; set; }
+
+
+        [ColumnName("rate_code"), LoadColumn(1)]
+        public float Rate_code { get; set; }
+
+
+        [ColumnName("passenger_count"), LoadColumn(2)]
+        public float Passenger_count { get; set; }
+
+
+        [ColumnName("trip_time_in_secs"), LoadColumn(3)]
+        public float Trip_time_in_secs { get; set; }
+
+
+        [ColumnName("trip_distance"), LoadColumn(4)]
+        public float Trip_distance { get; set; }
+
+
+        [ColumnName("payment_type"), LoadColumn(5)]
+        public string Payment_type { get; set; }
+
+
+        [ColumnName("fare_amount"), LoadColumn(6)]
+        public float Fare_amount { get; set; }
+
+
+}
+
+#!csharp
+
+public class ModelOutput
+{
+    public float Score { get; set; }
+}
+
+#!csharp
+
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using Microsoft.ML;
+using Microsoft.ML.Data;
+
+#!csharp
+
+/* Setup the pipeline and train the model */
+
+#!time
+
+var mlContext = new MLContext();
+
+IDataView trainingDataView = mlContext.Data.LoadFromTextFile<ModelInput>(
+    path: taxiDataPath,
+    hasHeader: true,
+    separatorChar: ',',
+    allowQuoting: true,
+    allowSparse: false);
+
+// Build training pipeline
+// Data process configuration with pipeline data transformations 
+var dataProcessPipeline = mlContext.Transforms.Categorical.OneHotEncoding(new[] { new InputOutputColumnPair("vendor_id", "vendor_id"), new InputOutputColumnPair("payment_type", "payment_type") })
+    .Append(mlContext.Transforms.Concatenate("Features", new[] { "vendor_id", "payment_type", "rate_code", "passenger_count", "trip_time_in_secs", "trip_distance" }));
+           
+// Set the training algorithm 
+var trainer = mlContext.Regression.Trainers.LightGbm(labelColumnName: "fare_amount", featureColumnName: "Features");
+
+var trainingPipeline = dataProcessPipeline.Append(trainer);
+
+// Train Model
+ITransformer model = trainingPipeline.Fit(trainingDataView);
+
+#!csharp
+
+var crossValidationResults = mlContext.Regression.CrossValidate(trainingDataView, trainingPipeline, numberOfFolds: 5, labelColumnName: "fare_amount");
+
+var L1 = crossValidationResults.Select(r => r.Metrics.MeanAbsoluteError);
+var L2 = crossValidationResults.Select(r => r.Metrics.MeanSquaredError);
+var RMS = crossValidationResults.Select(r => r.Metrics.RootMeanSquaredError);
+var lossFunction = crossValidationResults.Select(r => r.Metrics.LossFunction);
+var R2 = crossValidationResults.Select(r => r.Metrics.RSquared);
+
+
+var metricNames = new StringDataFrameColumn("Metric Name", new[] {"Average L1 Loss", "Average L2 Loss", "Average RMS", "Average Loss Function", "Average R-Squared"});
+var metricValues = new StringDataFrameColumn("Value",new[] {$"{L1.Average():0.###}", $"{L2.Average():0.###}", $"{RMS.Average():0.###}", $"{lossFunction.Average():0.###}", $"{R2.Average():0.###}"});
+var stats = new DataFrame(metricNames, metricValues);
+
+stats
+
+#!csharp
+
+using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.IO;
+using System.Linq;
+
+#!csharp
+
+/* Caculate the Permutation Feature Importance - the individual importance of each feature. This gives a way to measure the effect of 
+each feature on the model output. A lower value indicates more importance. Learn more at... 
+https://docs.microsoft.com/en-us/dotnet/machine-learning/how-to-guides/explain-machine-learning-model-permutation-feature-importance-ml-net */
+
+var predictor = (ISingleFeaturePredictionTransformer<object>) ((IEnumerable<ITransformer>)model).Last();
+var preprocessedTrainData = model.Transform(trainingDataView);
+
+
+    VBuffer<ReadOnlyMemory<char>> nameBuffer = default;
+    preprocessedTrainData.Schema["Features"].Annotations.GetValue("SlotNames", ref nameBuffer); // NOTE: The column name "Features" needs to match the featureColumnName used in the trainer, the name "SlotNames" is always the same regardless of trainer.
+    var featureColumnNames = nameBuffer.DenseValues().ToList();
+
+    ImmutableArray<RegressionMetricsStatistics> permutationFeatureImportance =
+        mlContext
+        .Regression
+        .PermutationFeatureImportance(predictor, preprocessedTrainData, permutationCount: 3, labelColumnName: "fare_amount");
+
+    var featureImportanceMetrics =
+        permutationFeatureImportance
+        .Select((metric, index) => new { index, metric.RSquared })
+        .OrderByDescending(myFeatures => Math.Abs(myFeatures.RSquared.Mean));
+
+    
+    var featureNames = new List<string>();
+    var featurePFI = new List<double>();
+    foreach (var feature in featureImportanceMetrics)
+    {
+        featureNames.Add($"{featureColumnNames[feature.index],-20}");
+        featurePFI.Add(feature.RSquared.Mean);
+    }
+    var featureImportance = new DataFrame(new StringDataFrameColumn("Feature", featureNames.ToArray() ), new DoubleDataFrameColumn("R-Squared Impact",featurePFI.ToArray()));
+    
+    featureImportance
+
+#!csharp
+
+/* Graph the PFI results */
+
+var pfiBar = new Bar()
+{
+    x = featureNames,
+    y = featurePFI,
+    dy = featurePFI[0]/100
+};
+
+var pfiChart = Chart.Plot(pfiBar);
+pfiChart.WithXTitle("Feature");
+pfiChart.WithYTitle("Contribution (delta R-Squared)");
+pfiChart.Width = 600;
+pfiChart.Height = 600;
+display(pfiChart);
+
+#!csharp
+
+/* Compare the true value to the predicted value */
+var testResults = model.Transform(trainingDataView);
+
+var trueValues = testResults.GetColumn<float>("fare_amount");
+var predictedValues = testResults.GetColumn<float>("Score");
+
+var predictedVsTrue = new Scattergl()
+{
+    x = trueValues,
+    y = predictedValues,
+    mode = "markers",
+};
+
+var maximumValue = Math.Max(trueValues.Max(), predictedValues.Max());
+
+var perfectLine = new Scattergl()
+{
+    x = new[] {0, maximumValue},
+    y = new[] {0, maximumValue},
+    mode = "lines",
+};
+
+var chart = Chart.Plot(new[] {predictedVsTrue, perfectLine });
+chart.WithXTitle("True Values");
+chart.WithYTitle("Predicted Values");
+chart.WithLegend(false);
+chart.Width = 600;
+chart.Height = 600;
+display(chart);
