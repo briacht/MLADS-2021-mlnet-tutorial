@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using Microsoft.ML;
 using Microsoft.ML.Data;
 
@@ -8,19 +9,39 @@ namespace TaxiApp
     {
         static void Main(string[] args)
         {
-            // Sentiment analysis
-            var x = "Y";
+            // Taxi Price Prediction
+            MLContext mlContext = new MLContext();
+            
+            // Load model
+            ITransformer taxiFareModel = mlContext.Model.Load("taxi-fare-model.zip", out DataViewSchema modelSchema);
+
+            // Create prediction engine
+            var predEngine = mlContext.Model.CreatePredictionEngine<TaxiFareModelInput, TaxiFareModelOutput>(taxiFareModel);
+
+            var loop = "Y";
             string userInput = "";
             string printedString = "";
-            var sentimentInput = new SentimentModelInput();
+            TaxiFareModelInput input = new TaxiFareModelInput();
 
-            // Train sentiment model
-            var sentimentModel = trainSentimentModel();
-
-            // Consume sentiment model
-            while (x == "Y" || x == "y")
+            // Consume model
+            while (loop == "Y" || loop == "y")
             {
-                Console.WriteLine("Write a review of your taxi driver: ");
+                Console.WriteLine("Enter in your ride details: ");
+                Console.WriteLine("Trip distance (miles): ");
+                input.Trip_distance = float.Parse(Console.ReadLine(), CultureInfo.InvariantCulture.NumberFormat);
+                Console.WriteLine("Trip time (seconds): ");
+                input.Trip_time_in_secs = float.Parse(Console.ReadLine(), CultureInfo.InvariantCulture.NumberFormat);
+                Console.WriteLine("Number of passengers: ");
+                input.Passenger_count = float.Parse(Console.ReadLine(), CultureInfo.InvariantCulture.NumberFormat);
+                Console.WriteLine("Payment type (CSH or CRD): ");
+                input.Payment_type = Console.ReadLine();
+
+                TaxiFareModelOutput result = predEngine.Predict(input);
+
+                Console.WriteLine($"\nYour taxi fare will be ~${result.Score}");
+
+                Console.WriteLine("\nWrite a review of your taxi driver: ");
+                /*
                 sentimentInput.Comment = Console.ReadLine();
                 var result = consumeSentimentModel(sentimentModel, sentimentInput);
                 if (result.Prediction == "positive") { printedString = "Thanks for the great review! :)"; };
@@ -28,74 +49,51 @@ namespace TaxiApp
                 if (result.Prediction == "negative") { printedString = "We're sorry you had a bad experience. :("; }
 
                 Console.WriteLine($"\n{printedString}");
+                */
+                Console.WriteLine($"SENTIMENT ANALYSIS NOT IMPLEMENTED.");
 
-                Console.WriteLine("Would you like to leave another review (Y/N)?");
+                Console.WriteLine("\nWould you like to start over (Y/N)?");
+                loop = Console.ReadLine();
             };
                         
         }
 
-        public static ITransformer trainSentimentModel()
+        public class TaxiFareModelInput
         {
-            Console.WriteLine("Training model...");
-            string taxiDataPath = "yelp_labelled.txt";
+            [ColumnName("vendor_id"), LoadColumn(0)]
+            public string Vendor_id { get; set; }
 
-            var mlContext = new MLContext();
 
-            IDataView trainingDataView = mlContext.Data.LoadFromTextFile<SentimentModelInput>(
-                path: taxiDataPath,
-                hasHeader: true,
-                separatorChar: ',',
-                allowQuoting: true,
-                allowSparse: false);
+            [ColumnName("rate_code"), LoadColumn(1)]
+            public float Rate_code { get; set; }
 
-            // Add data transformations to pipeline
-            var dataProcessPipeline = mlContext.Transforms.Conversion.MapValueToKey(@"Sentiment", @"Sentiment")
-                .Append(mlContext.Transforms.Text.FeaturizeText(@"Comment_tf", @"Comment"))
-                .Append(mlContext.Transforms.CopyColumns(@"Features", @"Comment_tf"))
-                .Append(mlContext.Transforms.NormalizeMinMax(@"Features", @"Features"));
 
-            // Set the training algorithm 
-            var trainer = mlContext.MulticlassClassification.Trainers.OneVersusAll(binaryEstimator: mlContext.BinaryClassification.Trainers.AveragedPerceptron(labelColumnName: @"Sentiment"), labelColumnName: @"Sentiment")
-                .Append(mlContext.Transforms.Conversion.MapKeyToValue(@"PredictedLabel", @"PredictedLabel"));
+            [ColumnName("passenger_count"), LoadColumn(2)]
+            public float Passenger_count { get; set; }
 
-            // Add trainer to pipeline
-            var trainingPipeline = dataProcessPipeline.Append(trainer);
 
-            // Train model
-            ITransformer sentimentModel = trainingPipeline.Fit(trainingDataView);
+            [ColumnName("trip_time_in_secs"), LoadColumn(3)]
+            public float Trip_time_in_secs { get; set; }
 
-            Console.WriteLine("Done training!");
 
-            return sentimentModel;
+            [ColumnName("trip_distance"), LoadColumn(4)]
+            public float Trip_distance { get; set; }
+
+
+            [ColumnName("payment_type"), LoadColumn(5)]
+            public string Payment_type { get; set; }
+
+
+            [ColumnName("fare_amount"), LoadColumn(6)]
+            public float Fare_amount { get; set; }
+
+
         }
 
-        public static SentimentModelOutput consumeSentimentModel(ITransformer sentimentModel, SentimentModelInput input)
+        // Define the model output schema
+        public class TaxiFareModelOutput
         {
-            MLContext mlContext = new MLContext();
-
-            var predEngine = mlContext.Model.CreatePredictionEngine<SentimentModelInput, SentimentModelOutput>(sentimentModel);
-
-            SentimentModelOutput result = predEngine.Predict(input);
-
-            return result;
-        }
-
-        public class SentimentModelInput
-        {
-            [ColumnName(@"Comment"), LoadColumn(0)]
-            public string Comment { get; set; }
-
-            [ColumnName(@"Sentiment"), LoadColumn(0)]
-            public string Sentiment { get; set; }
-        }
-
-        public class SentimentModelOutput
-        {
-
-            [ColumnName("PredictedLabel")]
-            public string Prediction { get; set; }
-
-            public float[] Score { get; set; }
+            public float Score { get; set; }
         }
     }
 }

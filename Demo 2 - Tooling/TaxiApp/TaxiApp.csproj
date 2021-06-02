@@ -20,31 +20,10 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-  <ItemGroup Label="TaxiFareModel">
-    <None Include="TaxiFareModel.consumption.cs">
-      <DependentUpon>TaxiFareModel.mbconfig</DependentUpon>
-    </None>
-    <None Include="TaxiFareModel.training.cs">
-      <DependentUpon>TaxiFareModel.mbconfig</DependentUpon>
-    </None>
-    <None Include="TaxiFareModel.zip">
-      <DependentUpon>TaxiFareModel.mbconfig</DependentUpon>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup Label="TaxiFareModell">
-    <None Include="TaxiFareModell.consumption.cs">
-      <DependentUpon>TaxiFareModell.mbconfig</DependentUpon>
-    </None>
-    <None Include="TaxiFareModell.training.cs">
-      <DependentUpon>TaxiFareModell.mbconfig</DependentUpon>
-    </None>
-    <None Include="TaxiFareModell.zip">
-      <DependentUpon>TaxiFareModell.mbconfig</DependentUpon>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
   <ItemGroup>
+    <None Update="taxi-fare-model.zip">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="yelp_labelled.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
