@@ -15,15 +15,15 @@ This demo uses the ML.NET API in a .NET Interactive Notebook to build a machine 
 
 ### Opening a Notebook
 
-Open the Command Pallette (**Ctrl+Shift+P**), select **.NET Interactive: Open notebook** and navigate to the *TaxiFareInteractive.ipynb* file.
+Open the Command Pallette (**Ctrl+Shift+P**), select **.NET Interactive: Open notebook** and navigate to the *TaxiFareInteractive.dib* file.
 ![Screenshot of VS Code Command Pallette](../Images/vscode-command-pallette.png)
 
 ### Running cells in a Notebook
 
 To run one cell, you can:
 
-1. Click the play button next to the call, or
-2. Hit **Ctrl+Alt+Enter**
+1. Click the play button to the left of the cell, or
+2. Click within a cell and hit **Ctrl+Alt+Enter**.
 
 To execute all cells at once, hit the play button icon in the top right.
 ![Screenshot of the Execute all cells icon](../Images/execute-all-cells.png)
