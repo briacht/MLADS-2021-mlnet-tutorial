@@ -25,7 +25,7 @@ using Microsoft.ML.Data;
 
 #!csharp
 
-/* Register the data */
+// Register data into DataFrame
 
 using Microsoft.AspNetCore.Html;
 using Microsoft.DotNet.Interactive.Formatting;
@@ -121,7 +121,26 @@ IDataView trainingDataView = mlContext.Data.LoadFromTextFile<ModelInput>(
     allowQuoting: true,
     allowSparse: false);
 
-Console.WriteLine("Done...")
+Console.WriteLine("Done...");
+// Display training data schema
+display(trainingDataView.Schema);
+
+#!csharp
+
+// Show 5 rows of loaded data
+public static List<ModelInput> Head(MLContext mlContext, IDataView dataView, int numberOfRows = 4){
+
+    var rows = mlContext.Data.CreateEnumerable<ModelInput>(dataView, reuseRowObject: false)
+                        .Take(numberOfRows)
+                        .ToList();
+
+    return rows;
+}
+
+display(h4("Showing 5 rows from training DataView:"));
+
+var fewRows = Head(mlContext, trainingDataView, 5);
+display(fewRows);
 
 #!csharp
 
@@ -146,6 +165,8 @@ Console.WriteLine("Done training model...")
 
 #!csharp
 
+// Evaluate the model using the cross validation method
+// Learn more about cross validation at https://aka.ms/mlnet-cross-validation
 var crossValidationResults = mlContext.Regression.CrossValidate(trainingDataView, trainingPipeline, numberOfFolds: 5, labelColumnName: "fare_amount");
 
 var L1 = crossValidationResults.Select(r => r.Metrics.MeanAbsoluteError);
@@ -163,17 +184,55 @@ stats
 
 #!csharp
 
-using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.IO;
-using System.Linq;
+// Consume the model
+
+// Define sample model input
+var sampleInput = new ModelInput(){
+    Vendor_id = "VTS",
+    Rate_code = 1f,
+    Passenger_count = 1,
+    Trip_distance = 3.75f,
+    Payment_type = "CSH",
+    Fare_amount = 0 // actual fare for this trip = 15.5
+};
+
+// Create a Prediction Engine (used to make single predictions)
+var predEngine = mlContext.Model.CreatePredictionEngine<ModelInput, ModelOutput>(model);
+
+
+// Use the model and Prediction Engine to predict on new sample data
+var prediction = predEngine.Predict(sampleInput);
+
+// Print out the actual value and the predicted value
+Console.WriteLine($"Predicted fare: ${prediction.Score:0.#0}");
+Console.WriteLine($"Actual fare: $15.50");
 
 #!csharp
 
-/* Caculate the Permutation Feature Importance - the individual importance of each feature. This gives a way to measure the effect of 
-each feature on the model output. A lower value indicates more importance. Learn more at... 
-https://docs.microsoft.com/en-us/dotnet/machine-learning/how-to-guides/explain-machine-learning-model-permutation-feature-importance-ml-net */
+// Plot distribution of fares by cost
+
+int numberOfRows = 5000;
+
+float[] fares = trainingDataView.GetColumn<float>("fare_amount").Take(numberOfRows).ToArray();
+
+float[] distances = trainingDataView.GetColumn<float>("trip_distance").Take(numberOfRows).ToArray();
+
+// Distribution of taxi trips per cost
+var faresHistogram = Chart.Plot(new Histogram(){x = fares, autobinx = false, nbinsx = 20});
+
+var layout = new Layout.Layout(){ title= "Distribution of taxi trips per cost" };
+
+faresHistogram.WithLayout(layout);
+faresHistogram.WithXTitle("Fare ranges");
+faresHistogram.WithYTitle("Number of trips");
+
+display(faresHistogram);
+
+#!csharp
+
+// Calculate and graph the Permutation Feature Importance (PFI)
+// PFI gives a way to measure the effect of each feature on the model output (or the individual importance of each feature).
+// Learn more at https://aka.ms/mlnet-pfi.
 
 var predictor = (ISingleFeaturePredictionTransformer<object>) ((IEnumerable<ITransformer>)model).Last();
 var preprocessedTrainData = model.Transform(trainingDataView);
@@ -199,15 +258,17 @@ var preprocessedTrainData = model.Transform(trainingDataView);
     foreach (var feature in featureImportanceMetrics)
     {
         featureNames.Add($"{featureColumnNames[feature.index],-20}");
+        // A large R-Squared difference means that feature has more importance
         featurePFI.Add(feature.RSquared.Mean);
     }
+    
     var featureImportance = new DataFrame(new StringDataFrameColumn("Feature", featureNames.ToArray() ), new DoubleDataFrameColumn("R-Squared Impact",featurePFI.ToArray()));
     
     featureImportance
 
 #!csharp
 
-/* Graph the PFI results */
+// Graph the PFI results
 
 var pfiBar = new Bar()
 {
@@ -225,12 +286,15 @@ display(pfiChart);
 
 #!csharp
 
-/* Compare the true value to the predicted value */
+// Compare the actual values to the predicted values
+
+// Use Transform method for batch predictions
 var testResults = model.Transform(trainingDataView);
 
 var trueValues = testResults.GetColumn<float>("fare_amount");
 var predictedValues = testResults.GetColumn<float>("Score");
 
+// Scatter plot for true values vs. predicted values
 var predictedVsTrue = new Scattergl()
 {
     x = trueValues,
