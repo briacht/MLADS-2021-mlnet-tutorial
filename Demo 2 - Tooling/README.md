@@ -4,25 +4,33 @@ This demo consumes the Taxi Fare model created in [Demo 1](https://github.com/br
 
 ![Model Builder](https://devblogs.microsoft.com/dotnet/wp-content/uploads/sites/10/2021/03/model-builder.png)
 
+The data used for training is from the [Sentiment Labelled Sentences dataset](https://archive.ics.uci.edu/ml/machine-learning-databases/00331/sentiment%20labelled%20sentences.zip) in the UCI Machine Learning Repository.
+
 
 ## Getting started
 
 ### Set up
+
 #### Model Builder:
+
 1. Install [Visual Studio 2019](https://visualstudio.microsoft.com/downloads/).
 2. Install any .NET Workload and check the optional ML.NET Model Builder (Preview) component.
 ![VS Installer Workloads](https://dotnet.microsoft.com/static/images/vs-installer-model-builder.png?v=vmvdf1n9u-IZSU3TCZz8Xb9lmlao4aJo5158Ghyt-f8)
-4. Enable the Preview Feature by opening Visual Studio and going to **Tools > Options > Environment > Preview Features** and checking **Enable ML.NET Model Builder**.
+3. Enable the Preview Feature by opening Visual Studio and going to **Tools > Options > Environment > Preview Features** and checking **Enable ML.NET Model Builder**.
 ![Preview Features Options Dialog](https://dotnet.microsoft.com/static/images/enable-model-builder.png?v=givtGJTkQK9b7pWvl2NvoM9Txun8DH0JEcBKvbQbAZs)
 
 #### ML.NET CLI (cross-platform):
+
 1. Install the latest [.NET 5 SDK](https://dotnet.microsoft.com/download/dotnet/5.0).
 2. Open any command line and run:
-```dotnet tool install -g mlnet ```
-3. Run the following command to see the available options for ML.NET CLI:
-```mlnet -h ```
 
-Note: If you're using a console other than Bash (for example, zsh, which is the new default for macOS), then you'll need to give mlnet executable permissions and include mlnet to the system path. Instructions on how to do this should appear in the terminal when you install mlnet (or any global tool).
+    ```dotnet tool install -g mlnet```
+
+3. Run the following command to see the available options for ML.NET CLI:
+
+    ```mlnet -h```
+
+> Note: If you're using a console other than Bash (for example, zsh, which is the new default for macOS), then you'll need to give mlnet executable permissions and include mlnet to the system path. Instructions on how to do this should appear in the terminal when you install mlnet (or any global tool).
 
 ### Opening Model Builder
 
@@ -31,5 +39,5 @@ Note: If you're using a console other than Bash (for example, zsh, which is the 
 
 ### Additional resources
 
-- [Model Builder Doc](https://docs.microsoft.com/en-us/dotnet/machine-learning/automate-training-with-model-builder)
-- [ML.NET CLI Doc](https://docs.microsoft.com/en-us/dotnet/machine-learning/automate-training-with-cli)
+- [Model Builder Doc](https://docs.microsoft.com/dotnet/machine-learning/automate-training-with-model-builder)
+- [ML.NET CLI Doc](https://docs.microsoft.com/dotnet/machine-learning/automate-training-with-cli)
