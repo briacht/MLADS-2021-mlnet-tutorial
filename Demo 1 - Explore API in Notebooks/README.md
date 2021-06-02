@@ -2,6 +2,10 @@
 
 This demo uses the ML.NET API in a .NET Interactive Notebook to build a machine learning pipeline, train and evaluate a model, and consume the model.
 
+This will be a **regression** model that predicts the price of taxi fare based on several features such as distance travelled, number of passengers, etc.
+
+The data used for training is originally from the [NYC TLC Taxi Trip dataset](https://www1.nyc.gov/site/tlc/about/tlc-trip-record-data.page).
+
 ## Getting started
 
 ### Set up
