@@ -11,17 +11,18 @@ namespace TaxiApp
         {
             // Taxi Price Prediction
             MLContext mlContext = new MLContext();
-            
+
             // Load model
             ITransformer taxiFareModel = mlContext.Model.Load("taxi-fare-model.zip", out DataViewSchema modelSchema);
 
-            // Create prediction engine
+            // Create Prediction Engine
             var predEngine = mlContext.Model.CreatePredictionEngine<TaxiFareModelInput, TaxiFareModelOutput>(taxiFareModel);
 
             var loop = "Y";
-            string userInput = "";
             string printedString = "";
+            
             TaxiFareModelInput input = new TaxiFareModelInput();
+            //ReviewSentimentModel.ModelInput reviewInput = new ReviewSentimentModel.ModelInput();
 
             // Consume model
             while (loop == "Y" || loop == "y")
@@ -42,20 +43,22 @@ namespace TaxiApp
 
                 Console.WriteLine("\nWrite a review of your taxi driver: ");
                 /*
-                sentimentInput.Comment = Console.ReadLine();
-                var result = consumeSentimentModel(sentimentModel, sentimentInput);
-                if (result.Prediction == "positive") { printedString = "Thanks for the great review! :)"; };
+                reviewInput.Comment = Console.ReadLine();
 
-                if (result.Prediction == "negative") { printedString = "We're sorry you had a bad experience. :("; }
+                var sentimentResult = ReviewSentimentModel.Predict(reviewInput);
+
+                if (sentimentResult.Prediction == "positive") { printedString = "Thanks for the great review! :)"; };
+
+                if (sentimentResult.Prediction == "negative") { printedString = "We're sorry you had a bad experience. :("; }
 
                 Console.WriteLine($"\n{printedString}");
                 */
-                Console.WriteLine($"SENTIMENT ANALYSIS NOT IMPLEMENTED.");
+                Console.WriteLine($"\nML NOT IMPLEMENTED");
 
                 Console.WriteLine("\nWould you like to start over (Y/N)?");
                 loop = Console.ReadLine();
             };
-                        
+
         }
 
         public class TaxiFareModelInput
@@ -63,31 +66,23 @@ namespace TaxiApp
             [ColumnName("vendor_id"), LoadColumn(0)]
             public string Vendor_id { get; set; }
 
-
             [ColumnName("rate_code"), LoadColumn(1)]
             public float Rate_code { get; set; }
-
 
             [ColumnName("passenger_count"), LoadColumn(2)]
             public float Passenger_count { get; set; }
 
-
             [ColumnName("trip_time_in_secs"), LoadColumn(3)]
             public float Trip_time_in_secs { get; set; }
-
 
             [ColumnName("trip_distance"), LoadColumn(4)]
             public float Trip_distance { get; set; }
 
-
             [ColumnName("payment_type"), LoadColumn(5)]
             public string Payment_type { get; set; }
 
-
             [ColumnName("fare_amount"), LoadColumn(6)]
             public float Fare_amount { get; set; }
-
-
         }
 
         // Define the model output schema
