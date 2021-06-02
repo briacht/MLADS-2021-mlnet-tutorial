@@ -6,12 +6,11 @@ This demo consumes the Taxi Fare model created in [Demo 1](https://github.com/br
 
 The data used for training is from the [Sentiment Labelled Sentences dataset](https://archive.ics.uci.edu/ml/machine-learning-databases/00331/sentiment%20labelled%20sentences.zip) in the UCI Machine Learning Repository.
 
-
 ## Getting started
 
 ### Set up
 
-#### Model Builder:
+#### Model Builder
 
 1. Install [Visual Studio 2019](https://visualstudio.microsoft.com/downloads/).
 2. Install any .NET Workload and check the optional ML.NET Model Builder (Preview) component.
@@ -19,7 +18,7 @@ The data used for training is from the [Sentiment Labelled Sentences dataset](ht
 3. Enable the Preview Feature by opening Visual Studio and going to **Tools > Options > Environment > Preview Features** and checking **Enable ML.NET Model Builder**.
 ![Preview Features Options Dialog](https://dotnet.microsoft.com/static/images/enable-model-builder.png?v=givtGJTkQK9b7pWvl2NvoM9Txun8DH0JEcBKvbQbAZs)
 
-#### ML.NET CLI (cross-platform):
+#### ML.NET CLI (cross-platform)
 
 1. Install the latest [.NET 5 SDK](https://dotnet.microsoft.com/download/dotnet/5.0).
 2. Open any command line and run:
