@@ -209,6 +209,11 @@ Console.WriteLine($"Actual fare: $15.50");
 
 #!csharp
 
+// Save the model
+mlContext.Model.Save(model, trainingDataView.Schema, "C:/Datasets/taxi-fare-model.zip");
+
+#!csharp
+
 // Plot distribution of fares by cost
 
 int numberOfRows = 5000;
