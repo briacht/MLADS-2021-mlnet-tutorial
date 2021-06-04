@@ -1,0 +1,127 @@
+﻿{
+  "TrainingConfigurationVersion": 0,
+  "TrainingTime": 120,
+  "Scenario": {
+    "ScenarioType": "Classification"
+  },
+  "DataSource": {
+    "DataSourceType": "TabularFile",
+    "FilePath": "C:\\Datasets\\yelp_labelled.txt",
+    "Delimiter": "\t",
+    "DecimalMarker": ".",
+    "HasHeader": true,
+    "ColumnProperties": [
+      {
+        "ColumnName": "Comment",
+        "ColumnPurpose": "Feature",
+        "ColumnDataFormat": "String",
+        "IsCategorical": false
+      },
+      {
+        "ColumnName": "Sentiment",
+        "ColumnPurpose": "Label",
+        "ColumnDataFormat": "String",
+        "IsCategorical": true
+      }
+    ]
+  },
+  "Environment": {
+    "EnvironmentType": "LocalCPU"
+  },
+  "RunHistory": {
+    "Trials": [
+      {
+        "TrainerName": "LbfgsMaximumEntropyMulti",
+        "Score": 0.7833427378975838,
+        "RuntimeInSeconds": 1.4609999656677246
+      },
+      {
+        "TrainerName": "FastForestOva",
+        "Score": 0.76115743617418263,
+        "RuntimeInSeconds": 33.705001831054688
+      },
+      {
+        "TrainerName": "FastForestOva",
+        "Score": 0.7603822028577053,
+        "RuntimeInSeconds": 18.792999267578125
+      },
+      {
+        "TrainerName": "LbfgsLogisticRegressionOva",
+        "Score": 0.75889803454014226,
+        "RuntimeInSeconds": 3.1159999370574951
+      },
+      {
+        "TrainerName": "LbfgsMaximumEntropyMulti",
+        "Score": 0.75420208182163162,
+        "RuntimeInSeconds": 2.2160000801086426
+      },
+      {
+        "TrainerName": "FastTreeOva",
+        "Score": 0.73946285386946253,
+        "RuntimeInSeconds": 6.5380001068115234
+      },
+      {
+        "TrainerName": "FastTreeOva",
+        "Score": 0.73535743187462921,
+        "RuntimeInSeconds": 5.9770002365112305
+      },
+      {
+        "TrainerName": "FastForestOva",
+        "Score": 0.73327035296353538,
+        "RuntimeInSeconds": 9.4040002822875977
+      },
+      {
+        "TrainerName": "FastTreeOva",
+        "Score": 0.70651855874704039,
+        "RuntimeInSeconds": 6.2890000343322754
+      },
+      {
+        "TrainerName": "FastTreeOva",
+        "Score": 0.662219768851146,
+        "RuntimeInSeconds": 5.2750000953674316
+      },
+      {
+        "TrainerName": "LightGbmMulti",
+        "Score": 0.6549940781918232,
+        "RuntimeInSeconds": 4.129000186920166
+      },
+      {
+        "TrainerName": "LbfgsLogisticRegressionOva",
+        "Score": 0.64802256692009164,
+        "RuntimeInSeconds": 3.3580000400543213
+      },
+      {
+        "TrainerName": "LbfgsMaximumEntropyMulti",
+        "Score": 0.64495725637832246,
+        "RuntimeInSeconds": 2.5720000267028809
+      },
+      {
+        "TrainerName": "LightGbmMulti",
+        "Score": 0.62343009401024,
+        "RuntimeInSeconds": 4.1880002021789551
+      },
+      {
+        "TrainerName": "SdcaMaximumEntropyMulti",
+        "Score": 0.4982812662109416,
+        "RuntimeInSeconds": 2.0690000057220459
+      },
+      {
+        "TrainerName": "SdcaMaximumEntropyMulti",
+        "Score": 0.4982812662109416,
+        "RuntimeInSeconds": 2.1970000267028809
+      },
+      {
+        "TrainerName": "SdcaLogisticRegressionOva",
+        "Score": 0.4982812662109416,
+        "RuntimeInSeconds": 3.5220000743865967
+      },
+      {
+        "TrainerName": "SdcaMaximumEntropyMulti",
+        "Score": 0.4982812662109416,
+        "RuntimeInSeconds": 2.815000057220459
+      }
+    ],
+    "Pipeline": "[{\"EstimatorType\":\"FeaturizeText\",\"Inputs\":[\"Comment\"],\"Outputs\":[\"Comment\"]},{\"EstimatorType\":\"Concatenate\",\"Inputs\":[\"Comment\"],\"Outputs\":[\"Features\"]},{\"EstimatorType\":\"MapValueToKey\",\"Inputs\":[\"Sentiment\"],\"Outputs\":[\"Sentiment\"]},{\"EstimatorType\":\"NormalizeMinMax\",\"Inputs\":[\"Features\"],\"Outputs\":[\"Features\"]},{\"LabelColumnName\":\"Sentiment\",\"FeatureColumnName\":\"Features\",\"L1Regularization\":\"0.393444555960383\",\"L2Regularization\":\"4.05812179185324\",\"EstimatorType\":\"LbfgsMaximumEntropyMulti\",\"Inputs\":[\"Sentiment\"],\"Outputs\":[\"Features\"]},{\"EstimatorType\":\"MapKeyToValue\",\"Inputs\":[\"PredictedLabel\"],\"Outputs\":[\"PredictedLabel\"]}]",
+    "MetricName": "MicroAccuracy"
+  }
+}
