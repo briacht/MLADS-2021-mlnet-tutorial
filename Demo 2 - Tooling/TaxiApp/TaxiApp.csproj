@@ -8,6 +8,14 @@
     <PackageReference Include="Microsoft.ML.FastTree" Version="1.5.5" />
     <PackageReference Include="Microsoft.ML.LightGbm" Version="1.5.5" />
   </ItemGroup>
+  <ItemGroup>
+    <None Update="taxi-fare-model.zip">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="yelp_labelled.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
   <ItemGroup Label="ReviewSentimentModel">
     <None Include="ReviewSentimentModel.consumption.cs">
       <DependentUpon>ReviewSentimentModel.mbconfig</DependentUpon>
@@ -17,14 +25,6 @@
     </None>
     <None Include="ReviewSentimentModel.zip">
       <DependentUpon>ReviewSentimentModel.mbconfig</DependentUpon>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Update="taxi-fare-model.zip">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="yelp_labelled.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
