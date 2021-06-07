@@ -6,7 +6,7 @@
 #i "nuget:https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-tools/nuget/v3/index.json" 
 
 #r "nuget:Microsoft.ML,1.5.1"
-#r "nuget:Microsoft.ML.AutoML,0.17.1"
+#r "nuget:Microsoft.ML.LightGBM,1.5.1"
 #r "nuget:Microsoft.Data.Analysis,0.4.0"
 #r "nuget: XPlot.Plotly.Interactive, 4.0.1"
 
@@ -19,6 +19,9 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using Microsoft.Data.Analysis;
+using Microsoft.AspNetCore.Html;
+using Microsoft.DotNet.Interactive.Formatting;
+using static Microsoft.DotNet.Interactive.Formatting.PocketViewTags;
 using XPlot.Plotly;
 using Microsoft.ML;
 using Microsoft.ML.Data;
@@ -26,11 +29,6 @@ using Microsoft.ML.Data;
 #!csharp
 
 // Register data into DataFrame
-
-using Microsoft.AspNetCore.Html;
-using Microsoft.DotNet.Interactive.Formatting;
-using static Microsoft.DotNet.Interactive.Formatting.PocketViewTags;
-
 Formatter.Register<DataFrame>((df, writer) =>
 {
     var headers = new List<IHtmlContent>();
@@ -112,6 +110,7 @@ Console.WriteLine("Done defining model output...");
 
 string taxiDataPath = "taxi-fare-train.csv";
 
+// MLContext = Starting point for all ML.NET operations
 var mlContext = new MLContext();
 
 IDataView trainingDataView = mlContext.Data.LoadFromTextFile<ModelInput>(
