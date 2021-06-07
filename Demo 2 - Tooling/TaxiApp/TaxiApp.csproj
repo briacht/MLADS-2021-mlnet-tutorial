@@ -16,4 +16,16 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+  <ItemGroup Label="ReviewSentimentModel">
+    <None Include="ReviewSentimentModel.consumption.cs">
+      <DependentUpon>ReviewSentimentModel.mbconfig</DependentUpon>
+    </None>
+    <None Include="ReviewSentimentModel.training.cs">
+      <DependentUpon>ReviewSentimentModel.mbconfig</DependentUpon>
+    </None>
+    <None Include="ReviewSentimentModel.zip">
+      <DependentUpon>ReviewSentimentModel.mbconfig</DependentUpon>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>
