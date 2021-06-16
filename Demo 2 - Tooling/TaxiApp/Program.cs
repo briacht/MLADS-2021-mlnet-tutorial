@@ -22,7 +22,7 @@ namespace TaxiApp
             string printedString = "";
             
             TaxiFareModelInput input = new TaxiFareModelInput();
-            //ReviewSentimentModel.ModelInput reviewInput = new ReviewSentimentModel.ModelInput();
+            ReviewSentimentModel.ModelInput reviewInput = new ReviewSentimentModel.ModelInput();
 
             // Consume model
             while (loop == "Y" || loop == "y")
@@ -42,7 +42,7 @@ namespace TaxiApp
                 Console.WriteLine($"\nYour taxi fare will be ~${result.Score}");
 
                 Console.WriteLine("\nWrite a review of your taxi driver: ");
-                /*
+                
                 reviewInput.Comment = Console.ReadLine();
                 
                 var sentimentResult = ReviewSentimentModel.Predict(reviewInput);
@@ -52,8 +52,8 @@ namespace TaxiApp
                 if (sentimentResult.Prediction == "negative") { printedString = "We're sorry you had a bad experience. :("; }
 
                 Console.WriteLine($"\n{printedString}");
-                */
-                Console.WriteLine($"\nML NOT IMPLEMENTED");
+                
+                //Console.WriteLine($"\nML NOT IMPLEMENTED");
 
                 Console.WriteLine("\nWould you like to start over (Y/N)?");
                 loop = Console.ReadLine();
